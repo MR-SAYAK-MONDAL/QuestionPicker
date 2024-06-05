@@ -2,14 +2,10 @@ package com.example.questionpicker
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 import java.util.ArrayList
 import java.util.Collections
 
@@ -61,28 +57,12 @@ class MainActivity : AppCompatActivity() {
         shareButton.setOnClickListener {
             val resultText = resultTextView.text.toString()
             if (resultText.isNotEmpty()) {
-                saveToFile(resultText)
+                val intent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, resultText)
+                }
+                startActivity(Intent.createChooser(intent, "Share Output Text"))
             }
-        }
-    }
-
-    private fun saveToFile(data: String) {
-        val filename = "output.txt"
-        val fileContents = data.toByteArray()
-
-        val file = File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), filename)
-
-        try {
-            val fos = FileOutputStream(file)
-            fos.write(fileContents)
-            fos.close()
-
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "text/plain"
-            intent.putExtra(Intent.EXTRA_STREAM, file.absolutePath)
-            startActivity(Intent.createChooser(intent, "Share Output File"))
-        } catch (e: IOException) {
-            e.printStackTrace()
         }
     }
 }
